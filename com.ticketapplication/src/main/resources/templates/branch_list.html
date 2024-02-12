@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>branch list</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+        crossorigin="anonymous">
+  <style>
+    .lime-text { color: lime; }
+    </style>
+  <style>
+    .lime-border {
+        border: 2px solid lime;
+    }
+</style>
+  <!-- Include DataTables JavaScript -->
+  <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+
+  <script>
+ function showAlert(){alert('Data exported at: ' + dynamicPath);}</script>
+  <script th:inline="javascript">
+        var dynamicPath = /*[[${@environment.getProperty('my.path')}]]*/ 'defaultFallbackPath';
+    </script>
+
+
+</head>
+<body style="background-color: black;">
+
+<div th:if="${param.success}" class="d-flex justify-content-center align-items-center">
+  <div class="alex alert-info" style="font-size: 20px;font-weight: bold;">branch details registered successfully!</div>
+</div>
+<div th:if="${param.success2}" class="d-flex justify-content-center align-items-center">
+  <div class="alex alert-info" style="font-size: 20px;font-weight: bold;">branch details updated successfully!</div>
+</div>
+
+<div th:if="${param.successNew}" class="d-flex justify-content-center align-items-center">
+  <div class="alex alert-info" style="font-size: 20px;font-weight: bold;">phone number added!</div>
+</div>
+
+<div class="container-fluid bg-dark text-light py-3">
+  <header class="text-center">
+    <h2 class="display-6 lime-text"> Branch List</h2>
+  </header>
+</div>
+
+<div class="form-group mb-2 d-flex justify-content-center align-items-center">
+  <a th:href="@{/home}" class="btn btn-success btn-sm" style="margin-top: 0px; margin-right: 10px;">Home</a>
+  <a th:href="@{/opentickets}" class="btn btn-primary mb-2 btn-sm" style="margin-top: 5px; margin-left: 10px;">To Open
+    tickets</a>
+  <a th:href="@{/closedtickets}" class="btn btn-primary mb-2 btn-sm" style="margin-top: 5px; margin-left: 10px;">To Closed tickets</a>
+
+
+  <form th:action="@{/branch_list}" method="get" style="margin-left: 20px;">
+      <label for="searchid" style="margin-left:20px; color: lime"> Search by ID: </label>
+    <input style="margin-top:3px" type="text" id="searchid" name="searchid" />
+    <button style="margin-top:-6px" type="submit" class="btn btn-warning btn-sm">Search</button>
+  </form>
+
+
+  <form th:action="@{/branch_list}" method="get">
+    <label for="search" style="margin-left:20px; color: lime"> Global Search: </label>
+    <input style="margin-top:3px" type="text" id="search" name="searchValue"   />
+    <button style="margin-top:-6px" type="submit" class="btn btn-warning btn-sm">Search</button>
+  </form>
+
+  <a th:href="@{/addbranch}"
+     class="btn btn-success mb-2 btn-sm" style="margin-top: 5px; margin-left: 50px;">Add new Branch</a>
+  <a th:href="@{/device_list}" class="btn btn-primary mb-2 btn-sm" style="margin-top: 5px; margin-left: 30px;">To Serial Nums</a>
+
+  <form th:action="@{/branch_list/export}" method="get" style="margin-left:050px">
+    <button type="submit" class="btn btn-warning btn-sm " onclick="showAlert()">Export data</button>
+  </form>
+
+</div>
+
+<div th:if="${resultList != null and resultList.size() > 0}" class="d-flex justify-content-center align-items-center">
+  <table border="1" class="table table-dark" style="width:70%" id="addphonetable" >
+    <thead  >
+    <tr style="color:lime">
+      <th>ID</th>
+      <th>customer id</th>
+      <th>Branch Name</th>
+      <th>Phone num</th>
+      <th>City</th>
+      <th>Address</th>
+      <th>Email</th>
+      <th>Branch AFM</th>
+      <th>+ phone number</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <tr th:each="x : ${resultList}" th:class="${resultList.size() > 0} ? 'lime-border' : ''">
+
+      <td style="color:red" th:text="${x.id}"></td>
+      <td th:text="${x.aCustomerId}"></td>
+      <td th:text="${x.aCustomerName}"></td>
+      <td style="color:lime" th:text="${x.aCustomerPhoneNumber}"></td>
+      <td th:text="${x.aCustomerCity}"></td>
+      <td th:text="${x.aCustomerAddress}"></td>
+      <td th:text="${x.aCustomerEmail}"></td>
+      <td th:text="${x.aCustomerafm}"></td>
+      <td>
+        <a th:href="@{'/branch_list/' + ${x.id}}" target="_blank"
+           class="btn btn-info btn-sm">+ phone number</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<section class="container-fluid d-flex flex-column align-items-center
+ justify-content-center my-2 bg-dark text-light p-2">
+  <!-- Table -->
+  <table border="1" class="table table-dark" style="width:100%" id="listtable">
+    <thead>
+    <tr style="color:lime">
+      <th>ID</th>
+      <th>Customer id</th>
+      <th>Branch Name</th>
+      <th>Phone num</th>
+      <th>City</th>
+      <th>Address</th>
+      <th>Email</th>
+      <th>Branch AFM</th>
+      <th>Update</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="x : ${aCustomer}">
+      <td th:text="${x.id}"></td>
+      <td th:text="${x.aCustomerId}"></td>
+      <td th:text="${x.aCustomerName}"></td>
+      <td style="color:lime" th:text="${x.aCustomerPhoneNumber}"></td>
+      <td th:text="${x.aCustomerCity}"></td>
+      <td th:text="${x.aCustomerAddress}"></td>
+      <td th:text="${x.aCustomerEmail}"></td>
+      <td th:text="${x.aCustomerafm}"></td>
+      <td>
+        <a th:href="@{'/branch_list/' + ${x.id}}" target="_blank" class="btn btn-info btn-sm">Update</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</section>
+
+<script>
+    $(document).ready( function () {
+        $('#listtable').DataTable({searching: false, "autoWidth": false,
+         "lengthMenu": [ [-1, 100, 300, ], ["All",100, 300] ]});
+    } );
+</script>
+</body>
+</html>
